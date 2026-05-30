@@ -22,8 +22,13 @@ export default function LoginPortal() {
     setIsAuthenticating(true);
     setError('');
 
+    // 🟢 AUTO-DOMAIN LOGIC: Append the domain if he just types his name
+    const formattedEmail = email.includes('@') 
+      ? email 
+      : `${email}@earthenminersdesigns.com`;
+
     const { error: authError } = await supabase.auth.signInWithPassword({
-      email,
+      email: formattedEmail,
       password,
     });
 
@@ -69,15 +74,15 @@ export default function LoginPortal() {
         <form onSubmit={handleAuthentication} className="space-y-6">
           <div>
             <label className="block text-[#A1A1AA] text-[10px] font-bold tracking-[0.2em] uppercase mb-2">
-              Master Email
+              Master Handle
             </label>
             <input 
-              type="email" 
+              type="text" 
               required
               value={email}
               onChange={(e) => setEmail(e.target.value)}
               className="w-full bg-[#0A0C10] border border-[#27272A] rounded-sm px-4 py-4 text-white font-light focus:outline-none focus:border-[#14B8A6] transition-colors" 
-              placeholder="artisan@markjewelry.com" 
+              placeholder="mark" 
             />
           </div>
           <div>

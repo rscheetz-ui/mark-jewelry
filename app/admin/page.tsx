@@ -29,7 +29,7 @@ export default function AdminDashboard() {
       {/* 🟢 TOP NAVIGATION HEADER */}
       <header className="max-w-4xl mx-auto flex justify-between items-center mb-12 border-b border-gray-800 pb-6">
         <div>
-            <h1 className="text-3xl font-bold tracking-wider">MARK JEWELRY</h1>
+            <h1 className="text-3xl font-bold tracking-wider">Earthen Miners Designs</h1>
             <p className="text-gray-400 text-sm uppercase tracking-widest mt-1">Admin Control Panel</p>
         </div>
         {activeTab !== 'dashboard' && (

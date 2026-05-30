@@ -48,7 +48,7 @@ export default function Home() {
 
       {/* 🟢 NAVIGATION */}
       <nav className="w-full p-6 md:p-8 flex justify-between items-center border-b border-white/5 relative z-10 bg-[#05070A]/80 backdrop-blur-sm">
-        <div className="text-3xl display-font tracking-widest text-white">Earthen <span className="labradorite-teal">Miners Design</span></div>
+        <div className="text-3xl display-font tracking-widest text-white">Earthen Miners <span className="labradorite-teal">Designs</span></div>
         <div className="text-xs tracking-[0.3em] uppercase font-bold metal-oxidized hidden md:block">Forged from earth & fire • USA</div>
       </nav>
 
@@ -76,13 +76,13 @@ export default function Home() {
 
             {/* Current Process Copy */}
             <div className="md:col-span-2 p-8 md:p-16 flex flex-col justify-center">
-                <span className="text-sm font-semibold tracking-[0.2em] uppercase metal-oxidized mb-3">CURRENT PROCESS LOG</span>
+                <span className="text-sm font-semibold tracking-[0.2em] uppercase metal-oxidized mb-3">CURRENT PROJECT LOG</span>
                 <h1 className="text-6xl md:text-7xl font-bold leading-[0.9] mb-6 text-white display-font tracking-tight">
                     Follow <br /> The <span className="labradorite-flash">Build.</span>
                 </h1>
                 <div className="border-l-2 border-[#14B8A6] pl-6 py-1 mb-8">
                     <p className="text-lg md:text-xl text-[#A1A1AA] font-light leading-relaxed">
-                        I don't stockpile inventory. I forge one piece at a time. Right now, on the bench, is a custom solid silver cuff undergoing heavy hand-hammering and deep oxidation.
+                        I don't stockpile inventory. I forge one piece at a time. Right now, on the bench, is a custom stone pendant set in solid silver undergoing heavy hand-hammering and deep oxidation.
                     </p>
                     <p className="text-sm text-white/50 mt-4 italic">Updated: {new Date().toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' })} at {new Date().toLocaleTimeString('en-US', { hour: 'numeric', minute: '2-digit' })}</p>
                 </div>
@@ -140,7 +140,7 @@ export default function Home() {
                 <p className="text-lg md:text-xl font-bold leading-relaxed mb-6 uppercase text-white tracking-wide">
                     "The Labradorite stone has incredible flash, set deep into massive silver. I don't dread documenting my day anymore because I just want to look at this ring."
                 </p>
-                <p className="text-xs tracking-[0.2em] uppercase metal-oxidized font-bold">— Case Worker, NY</p>
+                <p className="text-xs tracking-[0.2em] uppercase metal-oxidized font-bold">— James Harfield, NY</p>
             </div>
             {/* Review Template 3 */}
             <div className="bg-[#0A0C10] p-8 border border-white/5 relative group rounded-sm overflow-hidden">
@@ -159,7 +159,7 @@ export default function Home() {
       <section className="bg-[#0A0C10] py-24 border-y border-white/5 relative z-10">
         <div className="max-w-7xl mx-auto px-6">
             <div className="flex flex-col md:flex-row md:items-end md:justify-between mb-16 gap-6">
-                <h2 className="text-4xl md:text-5xl display-font text-white uppercase tracking-wider">Available Acquirement</h2>
+                <h2 className="text-4xl md:text-5xl display-font text-white uppercase tracking-wider">Available Handiworks</h2>
                 <a href="/shop" className="w-fit border border-[#B59A54] text-[#B59A54] display-font tracking-[0.2em] px-8 py-3 hover:bg-[#B59A54] hover:text-black transition-colors text-sm">
                     Shop Entire Forge
                 </a>
@@ -228,7 +228,7 @@ export default function Home() {
 
       {/* 🟢 FOOTER */}
       <footer className="py-12 border-t border-white/5 bg-[#05070A] relative z-10 text-center">
-        <div className="text-sm tracking-[0.2em] uppercase font-bold text-white/30">MARK <span className="labradorite-teal">JEWELRY</span> &copy; {new Date().getFullYear()}</div>
+        <div className="text-sm tracking-[0.2em] uppercase font-bold text-white/30">EARTHEN MINERS <span className="labradorite-teal">DESIGNS</span> &copy; {new Date().getFullYear()}</div>
         <p className="text-xs text-white/10 mt-2">Unapologetic Craft. No Molds. No Fluff.</p>
       </footer>
     </div>
