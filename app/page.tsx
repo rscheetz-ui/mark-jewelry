@@ -1,6 +1,7 @@
 'use client'
 import { useState, useEffect } from 'react';
 import { createBrowserClient } from '@supabase/ssr';
+import Link from 'next/link';
 
 // Earthen Miners Designs Homepage - Industrial Artisan Aesthetic
 export default function Home() {
@@ -21,24 +22,23 @@ export default function Home() {
     { title: "Stacker Rings", slug: "stacker", description: "Wire rings for a self-customizing experience." },
   ];
 
-// Fetch from Supabase and construct the smart slideshow array
+  // Fetch from Supabase
   useEffect(() => {
     async function fetchBuild() {
       const { data } = await supabase.from('current_build').select('*').limit(1).single();
       
-      if (data && data.progress_images && data.progress_images.length > 0) {
+      // 🟢 CHANGED: Now checking data.status === 'active'
+      if (data && data.status === 'active' && data.progress_images && data.progress_images[0] !== "") {
         setBuildData(data);
         
         const progress = data.progress_images;
         const mostRecent = progress[progress.length - 1];
         
-        // 🟢 CHANGED: We now hardcode the local hero image here
         const sequence = [
           { url: '/banner2.png', label: "LIVE FROM THE WORKBENCH" },
           { url: mostRecent, label: "LATEST UPDATE" }
         ];
 
-        // Loop through the actual progress timeline
         progress.forEach((imgUrl: string, i: number) => {
             let label = "IN PROGRESS";
             if (i === 0) label = "LIVE FROM THE WORKBENCH";
@@ -47,20 +47,23 @@ export default function Home() {
         });
 
         setSlides(sequence);
+      } else {
+        // FORGE IS RESTING OR LOADING
+        setBuildData(data || { status: 'complete' }); // Provide fallback so it doesn't stay "establishing connection"
+        setSlides([{ url: '/banner2.png', label: "AWAITING NEXT IGNITION" }]);
       }
     }
     fetchBuild();
-  }, []);
+  }, []); // <-- Empty array to prevent rate limits
 
   // Handle the automatic slideshow interval
   useEffect(() => {
-    if (slides.length === 0) return;
+    if (slides.length <= 1) return; // Don't run interval if there's only the standby slide
     const interval = setInterval(() => {
       setSlideIndex((prevIndex) => (prevIndex + 1) % slides.length);
     }, 5500); 
     return () => clearInterval(interval);
   }, [slides]);
-
 
   return (
     <div className="min-h-screen bg-[#05070A] text-[#E0E6ED] font-sans antialiased selection:bg-[#14B8A6]/30 selection:text-[#CCFFFD]">
@@ -88,19 +91,19 @@ export default function Home() {
         <div className="text-xs tracking-[0.3em] uppercase font-bold metal-oxidized hidden md:block">Forged from earth & fire • USA</div>
       </nav>
 
-      {/* THE FORGE STATUS (Hero / Slideshow) */}
+      {/* 🟢 INTERACTIVE HERO FUNNEL */}
       <header className="relative w-full border-b border-white/5 labradorite-glow">
         <div className="max-w-7xl mx-auto grid md:grid-cols-5 gap-0 items-center">
             
-            {/* 🟢 THE DYNAMIC TIMELINE SLIDESHOW */}
-            <div className="md:col-span-3 aspect-[16/10] md:aspect-auto md:h-full border-r border-white/5 bg-[#0A0C10] relative overflow-hidden group">
+            {/* 1. INTERACTIVE IMAGE SLIDESHOW */}
+            <Link href="/workbench" className="md:col-span-3 aspect-[16/10] md:aspect-auto md:h-full border-r border-white/5 bg-[#0A0C10] relative overflow-hidden group block cursor-pointer">
                 
                 {slides.length > 0 ? slides.map((slide, index) => (
                     <img 
                         key={index}
                         src={slide.url}  
                         alt="Current state of the forge workbench" 
-                        className={`absolute inset-0 w-full h-full object-cover transition-opacity duration-1000 ${slideIndex === index ? 'opacity-100' : 'opacity-0'}`}
+                        className={`absolute inset-0 w-full h-full object-cover transition-all duration-1000 group-hover:scale-[1.03] group-hover:brightness-110 ${slideIndex === index ? 'opacity-100' : 'opacity-0'}`}
                     />
                 )) : (
                     <div className="w-full h-full flex flex-col items-center justify-center text-[#71717A] display-font min-h-[400px]">
@@ -109,43 +112,54 @@ export default function Home() {
                     </div>
                 )}
                 
-                <div className="absolute inset-0 bg-gradient-to-t from-black via-black/20 to-transparent"></div>
+                <div className="absolute inset-0 bg-gradient-to-t from-black via-black/20 to-transparent pointer-events-none"></div>
                 
-                {/* Dynamic Slide Label */}
                 {slides.length > 0 && (
-                  <div className="absolute bottom-6 left-6 flex items-center gap-3 bg-black/60 p-3 backdrop-blur-sm border border-white/10 z-10">
+                  <div className="absolute bottom-6 left-6 flex items-center gap-3 bg-black/60 p-3 backdrop-blur-sm border border-white/10 z-10 transition-all duration-300 group-hover:border-[#14B8A6]/50 group-hover:bg-black/80">
                       <div className="relative flex h-3 w-3">
-                          <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-[#00F2FE] opacity-75"></span>
-                          <span className="relative inline-flex rounded-full h-3 w-3 bg-[#00F2FE]"></span>
+                          <span className={`animate-ping absolute inline-flex h-full w-full rounded-full opacity-75 group-hover:opacity-100 ${buildData?.status === 'active' ? 'bg-[#00F2FE]' : 'bg-[#71717A]'}`}></span>
+                          <span className={`relative inline-flex rounded-full h-3 w-3 ${buildData?.status === 'active' ? 'bg-[#00F2FE] group-hover:shadow-[0_0_10px_#00F2FE]' : 'bg-[#71717A]'}`}></span>
                       </div>
-                      <span className="display-font text-white tracking-widest text-sm">
+                      <span className={`display-font tracking-widest text-sm transition-colors ${buildData?.status === 'active' ? 'text-white group-hover:text-[#00F2FE]' : 'text-[#A1A1AA]'}`}>
                           {slides[slideIndex].label}
                       </span>
                   </div>
                 )}
-            </div>
+            </Link>
 
-            {/* Current Process Copy */}
-<div className="md:col-span-2 p-8 md:p-16 flex flex-col justify-center">
-    <span className="text-sm font-semibold tracking-[0.2em] uppercase metal-oxidized mb-3">CURRENT PROJECT LOG</span>
-    <h1 className="text-6xl md:text-7xl font-bold leading-[0.9] mb-6 text-white display-font tracking-tight">
-        Follow <br /> The <span className="labradorite-flash">Build.</span>
-    </h1>
-    <div className="border-l-2 border-[#14B8A6] pl-6 py-1 mb-8">
-        <p className="text-lg md:text-xl text-[#A1A1AA] font-light leading-relaxed min-h-[5rem]">
-            {/* 🟢 CHANGED: Hardcoded the brand voice prefix here */}
-            I don't stockpile inventory. I forge one piece at a time. Right now, on the bench, {buildData ? buildData.description : "establishing connection to the workbench..."}
-        </p>
-        {buildData && (
-            <p className="text-sm text-white/50 mt-4 italic">
-                Updated: {new Date(buildData.updated_at).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' })}
-            </p>
-        )}
-    </div>
-    <button className="w-full md:w-fit bg-[#B59A54] text-black display-font text-lg tracking-[0.2em] px-10 py-5 hover:bg-white transition-colors duration-300">
-        Claim the current project
-    </button>
-</div>
+            <div className="md:col-span-2 p-8 md:p-16 flex flex-col justify-center">
+                <span className="text-sm font-semibold tracking-[0.2em] uppercase metal-oxidized mb-3">CURRENT PROJECT LOG</span>
+                
+                {/* 2. INTERACTIVE HEADER TEXT */}
+                <Link href="/workbench" className="inline-block group/text cursor-pointer w-fit">
+                    <h1 className="text-6xl md:text-7xl font-bold leading-[0.9] mb-6 text-white display-font tracking-tight transition-all duration-300 group-hover/text:text-[#00F2FE] group-hover/text:scale-[1.02] group-hover/text:drop-shadow-[0_0_20px_rgba(0,242,254,0.3)]">
+                        Follow <br /> The <span className="labradorite-flash">Build.</span>
+                    </h1>
+                </Link>
+
+                <div className="border-l-2 border-[#14B8A6] pl-6 py-1 mb-8">
+                    <p className="text-lg md:text-xl text-[#A1A1AA] font-light leading-relaxed min-h-[5rem]">
+                        {/* 🟢 SMART TEXT LOGIC */}
+                        {!buildData ? (
+                            "Establishing connection to the workbench..."
+                        ) : buildData.status === 'active' ? (
+                            `I don't stockpile inventory. I forge one piece at a time. Right now, on the bench, ${buildData.description || 'a new custom piece is underway.'}`
+                        ) : (
+                            "The anvil is currently resting. The previous piece has been finalized and moved to the vault. View the shop for available handiworks."
+                        )}
+                    </p>
+                    {buildData && buildData.status === 'active' && (
+                        <p className="text-sm text-white/50 mt-4 italic">
+                            Updated: {new Date(buildData.updated_at).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' })}
+                        </p>
+                    )}
+                </div>
+                
+                {/* 3. DYNAMIC CLAIM/ENTER BUTTON */}
+                <Link href={buildData?.status === 'active' ? "/workbench" : "/shop"} className="w-full md:w-fit bg-[#B59A54] text-black display-font text-lg tracking-[0.2em] px-10 py-5 hover:bg-white transition-all duration-300 hover:scale-105 text-center block hover:shadow-[0_0_20px_rgba(181,154,84,0.4)]">
+                    {buildData?.status === 'active' ? "Claim the current project" : "Enter the Shop"}
+                </Link>
+            </div>
         </div>
       </header>
 
@@ -175,7 +189,6 @@ export default function Home() {
       <section className="py-24 max-w-7xl mx-auto px-6 relative z-10">
         <h2 className="text-4xl md:text-5xl display-font text-center mb-16 text-white uppercase tracking-wider">Ironclad Verdicts</h2>
         <div className="grid md:grid-cols-3 gap-8">
-            {/* Review 1 */}
             <div className="bg-[#0A0C10] p-8 border border-white/5 relative group rounded-sm overflow-hidden">
                 <div className="absolute -bottom-10 -right-10 w-32 h-32 bg-[#14B8A6] opacity-5 blur-3xl group-hover:opacity-10 transition-opacity"></div>
                 <div className="flex items-center gap-2 text-xs uppercase tracking-[0.2em] text-[#A1A1AA] mb-1 font-semibold"><span>5.0</span> <span className="labradorite-flash">★★★★★</span></div>
@@ -184,7 +197,6 @@ export default function Home() {
                 </p>
                 <p className="text-xs tracking-[0.2em] uppercase metal-oxidized font-bold">— Jax M., CA</p>
             </div>
-            {/* Review 2 */}
             <div className="bg-[#0A0C10] p-8 border border-white/5 relative group rounded-sm overflow-hidden">
                 <div className="absolute -bottom-10 -right-10 w-32 h-32 bg-[#14B8A6] opacity-5 blur-3xl group-hover:opacity-10 transition-opacity"></div>
                 <div className="flex items-center gap-2 text-xs uppercase tracking-[0.2em] text-[#A1A1AA] mb-1 font-semibold"><span>5.0</span> <span className="labradorite-flash">★★★★★</span></div>
@@ -193,7 +205,6 @@ export default function Home() {
                 </p>
                 <p className="text-xs tracking-[0.2em] uppercase metal-oxidized font-bold">— James Harfield, NY</p>
             </div>
-            {/* Review 3 */}
             <div className="bg-[#0A0C10] p-8 border border-white/5 relative group rounded-sm overflow-hidden">
                 <div className="absolute -bottom-10 -right-10 w-32 h-32 bg-[#14B8A6] opacity-5 blur-3xl group-hover:opacity-10 transition-opacity"></div>
                 <div className="flex items-center gap-2 text-xs uppercase tracking-[0.2em] text-[#A1A1AA] mb-1 font-semibold"><span>5.0</span> <span className="labradorite-flash">★★★★★</span></div>
@@ -215,7 +226,6 @@ export default function Home() {
                 </a>
             </div>
             <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-8">
-                {/* Product 1 */}
                 <div className="group bg-[#05070A] border border-white/5">
                     <div className="aspect-square bg-[#111419] border-b border-white/5 relative overflow-hidden flex items-center justify-center grayscale group-hover:grayscale-0 transition-all duration-500">
                         <span className="text-xs text-white/20 display-font">[Product Image]</span>
@@ -229,7 +239,6 @@ export default function Home() {
                         </div>
                     </div>
                 </div>
-                 {/* Product 2 */}
                  <div className="group bg-[#05070A] border border-white/5">
                     <div className="aspect-square bg-[#111419] border-b border-white/5 relative overflow-hidden flex items-center justify-center grayscale group-hover:grayscale-0 transition-all duration-500">
                         <span className="text-xs text-white/20 display-font">[Product Image]</span>
@@ -243,7 +252,6 @@ export default function Home() {
                         </div>
                     </div>
                 </div>
-                 {/* Product 3 */}
                  <div className="group bg-[#05070A] border border-white/5">
                     <div className="aspect-square bg-[#111419] border-b border-white/5 relative overflow-hidden flex items-center justify-center grayscale group-hover:grayscale-0 transition-all duration-500">
                         <span className="text-xs text-white/20 display-font">[Product Image]</span>
@@ -257,7 +265,6 @@ export default function Home() {
                         </div>
                     </div>
                 </div>
-                 {/* Product 4 */}
                  <div className="group bg-[#05070A] border border-white/5">
                     <div className="aspect-square bg-[#111419] border-b border-white/5 relative overflow-hidden flex items-center justify-center grayscale group-hover:grayscale-0 transition-all duration-500">
                         <span className="text-xs text-white/20 display-font">[Product Image]</span>
